@@ -40,23 +40,66 @@ impl Motor {
     }
 }
 
-// Gpio uses BCM pin numbering. BCM GPIO 23 is tied to physical pin 16.
-const GPIO_LED: u8 = 23;
+struct Robot {
+    motor_1: Motor,
+    motor_2: Motor,
+}
+
+impl Robot {
+    fn new() -> Result<Robot, rppal::gpio::Error> {
+        let motor_1 = Motor::new(23, 24, 25)?;
+        let motor_2 = Motor::new(17, 27, 23)?;
+
+        Ok(Robot {
+            motor_1: motor_1,
+            motor_2: motor_2,
+        })
+    }
+
+    fn forward(&mut self) {
+        self.motor_1.forward();
+        self.motor_2.forward();
+    }
+
+    fn backward(&mut self) {
+        self.motor_1.backward();
+        self.motor_2.backward();
+    }
+
+    fn stop(&mut self) {
+        self.motor_1.stop();
+        self.motor_2.stop();
+    }
+
+    fn left(&mut self) {
+        self.motor_1.forward();
+        self.motor_2.backward();
+    }
+
+    fn right(&mut self) {
+        self.motor_1.backward();
+        self.motor_2.forward();
+    }
+}
 
 fn main() -> Result<(), Box<dyn Error>> {
     println!("Lets run a dc motor with h-bridge");
 
-    let mut motor = Motor::new(23, 24, 25)?;
+    let mut robot = Robot::new()?;
 
     let mut times = 0;
+    // Lets drive in a circle
     loop {
-        motor.stop();
-        thread::sleep_ms(500);
-        motor.forward();
-        thread::sleep_ms(3000);
-        motor.backward();
-        thread::sleep_ms(3000);
-
+        thread::sleep_ms(1000);
+        robot.left();
+        thread::sleep_ms(1000);
+        robot.right();
+        thread::sleep_ms(1000);
+        robot.backward();
+        thread::sleep_ms(1000);
+        robot.forward();
+        thread::sleep_ms(1000);
+        robot.stop();
         if (times >= 10) {
             break;
         }
