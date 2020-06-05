@@ -1,0 +1,3 @@
+[submodule "external_dependencies/tools"]
+	path = external_dependencies/tools
+	url = https://github.com/raspberrypi/tools
