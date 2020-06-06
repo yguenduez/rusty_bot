@@ -1,3 +1,3 @@
 [target.arm-unknown-linux-gnueabihf]
-linker = "/home/yasin/rpi_tools/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/bin/arm-linux-gnueabihf-cc"
+linker = "external_dependencies/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/bin/arm-linux-gnueabihf-cc"
 
