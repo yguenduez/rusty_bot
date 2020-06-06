@@ -48,7 +48,7 @@ struct Robot {
 impl Robot {
     fn new() -> Result<Robot, rppal::gpio::Error> {
         let motor_1 = Motor::new(23, 24, 25)?;
-        let motor_2 = Motor::new(17, 27, 23)?;
+        let motor_2 = Motor::new(17, 26, 22)?;
 
         Ok(Robot {
             motor_1: motor_1,
@@ -100,7 +100,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         robot.forward();
         thread::sleep_ms(1000);
         robot.stop();
-        if (times >= 10) {
+        if (times >= 5) {
             break;
         }
         times += 1;
