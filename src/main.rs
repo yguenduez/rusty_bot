@@ -1,8 +1,14 @@
+#[macro_use]
+extern crate serde_derive;
+extern crate serde;
+extern crate serde_json;
+
 use std::error::Error;
 use std::thread;
 use std::time::Duration;
 
 mod robot;
+mod tcp_server;
 
 fn main() -> Result<(), Box<dyn Error>> {
     println!("Lets run a dc motor with h-bridge");
