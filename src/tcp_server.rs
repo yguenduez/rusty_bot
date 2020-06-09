@@ -1,10 +1,27 @@
 use std::fmt;
 use std::io::{stdin, BufRead, BufReader, Error, Write};
 use std::net::{Ipv4Addr, SocketAddr};
-use std::thread;
 use std::net::{TcpListener, TcpStream};
+use std::thread;
 
 use serde::Deserialize;
+
+struct RingBuffer<T> {
+    internal_buffer: Vec<T>,
+    size: u16,
+}
+
+impl<T> RingBuffer<T> {
+    pub fn new(size: u16) -> Self {
+        RingBuffer {
+            internal_buffer: Vec::new(),
+            size: size,
+        }
+    }
+    pub fn insert(&mut self, value: T) {
+        self.internal_buffer.push(value);
+    }
+}
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Direction {
@@ -14,26 +31,20 @@ struct Direction {
 
 pub struct TCPServer {
     listener: TcpListener,
-    buffer: Vec<Direction>
+    buffer: RingBuffer<Direction>,
 }
 
 impl TCPServer {
     pub fn new() -> TCPServer {
         TCPServer {
             listener: TcpListener::bind("0.0.0.0:8888").unwrap(),
-            buffer: vec![]
+            buffer: RingBuffer::new(50),
         }
     }
     pub fn start_listening(&self) {
-        for stream in self.listener.incoming() {
-            match stream {
-                Err(e) => eprintln!("Failed to connect: {}", e),
-                Ok(stream) => {
-                    thread::spawn(move || {
-                        read_from_stream(stream).unwrap();
-                    });
-                }
-            }
+        match self.listener.accept() {
+            Ok((_hi, addr)) => println!("new client: {:?}", addr),
+            Err(e) => println!("couldn't get client: {:?}", e),
         }
     }
 }
