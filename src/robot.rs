@@ -1,6 +1,8 @@
 use rppal::gpio::{Gpio, OutputPin};
 use rppal::system::DeviceInfo;
 
+use crate::tcp_server::{TCPServer};
+
 struct Motor {
     enable_pin: OutputPin,
     pin_1: OutputPin,
@@ -12,6 +14,7 @@ impl Motor {
         let enable_pin = Gpio::new()?.get(enable)?.into_output();
         let pin_1 = Gpio::new()?.get(pin_1)?.into_output();
         let pin_2 = Gpio::new()?.get(pin_2)?.into_output();
+
 
         Ok(Motor {
             enable_pin: enable_pin,
@@ -75,5 +78,26 @@ impl Robot {
     pub fn right(&mut self) {
         self.motor_1.backward();
         self.motor_2.forward();
+    }
+}
+
+struct RobotController{
+    tcp_server: TCPServer,
+    robot: Robot
+}
+
+impl RobotController {
+    pub fn new(robot: Robot)->RobotController{
+        RobotController{
+            robot: robot,
+            tcp_server: TCPServer::new()
+        }
+    }
+
+    pub fn run(&self){
+        self.tcp_server.start_listening();
+        loop {
+            
+        }
     }
 }
