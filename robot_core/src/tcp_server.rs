@@ -1,10 +1,21 @@
+use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::io::{stdin, BufRead, BufReader, Error, Write};
 use std::net::{Ipv4Addr, SocketAddr};
 use std::net::{TcpListener, TcpStream};
 use std::thread;
 
-use serde::Deserialize;
+#[derive(Serialize, Deserialize)]
+pub struct Direction {
+    x: f32,
+    y: f32,
+}
+
+impl Direction {
+    pub fn new(x: f32, y: f32) -> Self {
+        Self { x: x, y: y }
+    }
+}
 
 struct RingBuffer<T> {
     internal_buffer: Vec<T>,
@@ -23,12 +34,6 @@ impl<T> RingBuffer<T> {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-struct Direction {
-    x: i32,
-    y: i32,
-}
-
 pub struct TCPServer {
     listener: TcpListener,
     buffer: RingBuffer<Direction>,
@@ -37,13 +42,16 @@ pub struct TCPServer {
 impl TCPServer {
     pub fn new() -> TCPServer {
         TCPServer {
-            listener: TcpListener::bind("0.0.0.0:8888").unwrap(),
+            listener: TcpListener::bind("raspberrypi.local:3333").unwrap(),
             buffer: RingBuffer::new(50),
         }
     }
     pub fn start_listening(&self) {
         match self.listener.accept() {
-            Ok((_hi, addr)) => println!("new client: {:?}", addr),
+            Ok((stream, addr)) => {
+                println!("new client: {:?}", addr);
+                read_from_stream(stream);
+            }
             Err(e) => println!("couldn't get client: {:?}", e),
         }
     }
@@ -52,6 +60,8 @@ impl TCPServer {
 fn read_from_stream(stream: TcpStream) -> Result<Direction, Error> {
     let mut de = serde_json::Deserializer::from_reader(stream);
     let u = Direction::deserialize(&mut de)?;
+
+    println!("Direction: {}, {}", u.x, u.y);
 
     Ok(u)
 }

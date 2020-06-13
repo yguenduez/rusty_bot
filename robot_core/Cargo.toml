@@ -1,0 +1,15 @@
+[package]
+name = "robot_core"
+version = "0.1.0"
+authors = ["ysngndz <ysngndz@gmail.com>"]
+edition = "2018"
+
+[lib]
+name = "robot_core"
+path = "src/lib.rs"
+
+[dependencies]
+serde = "1.0"
+serde_derive = "1.0"
+serde_json = "1.0"
+

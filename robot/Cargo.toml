@@ -1,0 +1,13 @@
+[package]
+name = "robot"
+version = "0.1.0"
+authors = ["ysngndz <ysngndz@gmail.com>"]
+edition = "2018"
+
+[[bin]]
+name = "robot"
+path = "src/main.rs"
+
+[dependencies]
+robot_core = { path = "../robot_core" }
+rppal = ""

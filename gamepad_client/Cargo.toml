@@ -1,0 +1,13 @@
+[package]
+name = "gamepad_client"
+version = "0.1.0"
+authors = ["ysngndz <ysngndz@gmail.com>"]
+edition = "2018"
+
+[[bin]]
+name = "gamepad_client"
+path = "src/gamepad_client.rs"
+
+[dependencies]
+gilrs = ""
+robot_core = { path = "../robot_core" }
