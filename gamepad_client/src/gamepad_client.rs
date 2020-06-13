@@ -21,14 +21,16 @@ fn main() {
             loop {
                 // Examine new events
                 while let Some(Event { id, event, time }) = gilrs.next_event() {
-                    println!("{:?} New event from {}: {:?}", time, id, event);
                     active_gamepad = Some(id);
                 }
                 // You can also use cached gamepad state
                 if let Some(gamepad) = active_gamepad.map(|id| gilrs.gamepad(id)) {
                     let axis_x_val = gamepad.value(Axis::LeftStickX);
                     let axis_y_val = gamepad.value(Axis::LeftStickY);
-                    let msg_dir = tcp_server::Direction::new(axis_x_val,axis_y_val);
+                    let msg_dir = tcp_server::Direction::new(axis_x_val, axis_y_val);
+                    stream
+                        .write_all(serde_json::to_string(&msg_dir).unwrap().as_bytes())
+                        .expect("Failed to write to server");
                 }
             }
         }
