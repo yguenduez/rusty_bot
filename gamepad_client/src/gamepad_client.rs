@@ -2,6 +2,7 @@ use gilrs::{Axis, Event, Gilrs};
 use std::io::{Read, Write};
 use std::net::TcpStream;
 use std::str::from_utf8;
+use std::thread;
 
 use robot_core::tcp_server;
 
@@ -27,10 +28,11 @@ fn main() {
                 if let Some(gamepad) = active_gamepad.map(|id| gilrs.gamepad(id)) {
                     let axis_x_val = gamepad.value(Axis::LeftStickX);
                     let axis_y_val = gamepad.value(Axis::LeftStickY);
-                    let msg_dir = tcp_server::Direction::new(axis_x_val, axis_y_val);
+                    let msg_dir = tcp_server::Direction::new(axis_x_val as f32, axis_y_val as f32);
                     stream
                         .write_all(serde_json::to_string(&msg_dir).unwrap().as_bytes())
                         .expect("Failed to write to server");
+                    thread::sleep_ms(50);
                 }
             }
         }

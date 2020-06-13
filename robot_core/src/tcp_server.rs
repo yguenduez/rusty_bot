@@ -57,11 +57,12 @@ impl TCPServer {
     }
 }
 
-fn read_from_stream(stream: TcpStream) -> Result<Direction, Error> {
-    let mut de = serde_json::Deserializer::from_reader(stream);
-    let u = Direction::deserialize(&mut de)?;
+fn read_from_stream(stream: TcpStream)  {
+    loop { // loop until EOF
+        let mut de = serde_json::Deserializer::from_reader(&stream);
+        let u = Direction::deserialize(&mut de).unwrap();
 
-    println!("Direction: {}, {}", u.x, u.y);
+        println!("Direction: {}, {}", u.x, u.y);
 
-    Ok(u)
+    }
 }
