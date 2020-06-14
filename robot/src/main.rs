@@ -1,3 +1,8 @@
+#[macro_use]
+extern crate serde_derive;
+extern crate serde;
+extern crate serde_json;
+
 use std::error::Error;
 use std::thread;
 use std::time::Duration;
@@ -5,10 +10,11 @@ use std::time::Duration;
 mod robot;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    println!("Lets run a dc motor with h-bridge");
+    println!("Init robot...");
 
     let mut robot = robot::Robot::new()?;
-    let robot_controller = robot::RobotController::new(robot);
+    let mut robot_controller = robot::RobotController::new(robot);
+    println!("Starting...");
 
     let mut times = 0;
     // Lets drive in a circle

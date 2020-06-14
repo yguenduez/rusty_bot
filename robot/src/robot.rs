@@ -2,6 +2,11 @@ use rppal::gpio::{Gpio, OutputPin};
 use rppal::system::DeviceInfo;
 
 use robot_core::tcp_server;
+use std::sync::Arc;
+use std::thread;
+use tcp_server::Direction;
+
+use serde::{Deserialize, Serialize};
 
 struct Motor {
     enable_pin: OutputPin,
@@ -80,20 +85,89 @@ impl Robot {
     }
 }
 
+#[derive(PartialEq, Eq)]
+pub enum CurrentDirection {
+    Left,
+    Right,
+    Forward,
+    Backward,
+    Undefined,
+}
+
+pub fn get_direction(dir: tcp_server::Direction) -> CurrentDirection {
+    if (dir.x > 0.8) {
+        CurrentDirection::Right
+    } else if (dir.x < -0.8) {
+        CurrentDirection::Left
+    } else if (dir.y > 0.8) {
+        CurrentDirection::Forward
+    } else if (dir.y < -0.8) {
+        CurrentDirection::Backward
+    } else {
+        CurrentDirection::Undefined
+    }
+}
+
 pub struct RobotController {
-    tcp_server: tcp_server::TCPServer,
     robot: Robot,
+    current_dir: CurrentDirection,
 }
 
 impl RobotController {
     pub fn new(robot: Robot) -> RobotController {
         RobotController {
             robot: robot,
-            tcp_server: tcp_server::TCPServer::new(),
+            current_dir: CurrentDirection::Undefined,
         }
     }
 
-    pub fn run(&self) {
-        self.tcp_server.start_listening();
+    pub fn run(&mut self) {
+        // listen to incoming data
+        let mut tcp_server = tcp_server::TCPServer::new();
+        match tcp_server.listener.accept() {
+            Ok((stream, addr)) => {
+                println!("new client: {:?}", addr);
+                loop {
+                    let mut de = serde_json::Deserializer::from_reader(&stream);
+                    let u = Direction::deserialize(&mut de);
+                    match u {
+                        Err(e) => println!("Could not deserialize message. Error: {}", e),
+                        Ok(dir) => {
+                            self.set_robot_dir_from_direction(dir);
+                        }
+                    }
+                    thread::sleep_ms(50);
+                }
+            }
+            Err(e) => println!("couldn't get client: {:?}", e),
+        }
+    }
+
+    pub fn set_robot_dir_from_direction(&mut self, dir: Direction) {
+        let planned_dir = get_direction(dir);
+
+        if self.current_dir == planned_dir {
+            return;
+        }
+
+        match planned_dir {
+            CurrentDirection::Forward => {
+                self.robot.forward();
+                self.current_dir = CurrentDirection::Forward;
+            }
+            CurrentDirection::Backward => {
+                self.robot.backward();
+                self.current_dir = CurrentDirection::Backward;
+            }
+            CurrentDirection::Left => {
+                self.robot.left();
+                self.current_dir = CurrentDirection::Left;
+            }
+            CurrentDirection::Right => {
+                self.robot.right();
+                self.current_dir = CurrentDirection::Right;
+            }
+            _ => (),
+        }
     }
 }

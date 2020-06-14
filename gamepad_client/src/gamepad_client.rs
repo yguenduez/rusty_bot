@@ -20,7 +20,6 @@ fn main() {
         Ok(mut stream) => {
             println!("Successfully connected to server in port 3333");
             loop {
-                // Examine new events
                 while let Some(Event { id, event, time }) = gilrs.next_event() {
                     active_gamepad = Some(id);
                 }
