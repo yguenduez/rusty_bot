@@ -91,7 +91,7 @@ pub enum CurrentDirection {
     Right,
     Forward,
     Backward,
-    Undefined,
+    Stop,
 }
 
 pub fn get_direction(dir: tcp_server::Direction) -> CurrentDirection {
@@ -104,7 +104,7 @@ pub fn get_direction(dir: tcp_server::Direction) -> CurrentDirection {
     } else if (dir.y < -0.8) {
         CurrentDirection::Backward
     } else {
-        CurrentDirection::Undefined
+        CurrentDirection::Stop
     }
 }
 
@@ -117,7 +117,7 @@ impl RobotController {
     pub fn new(robot: Robot) -> RobotController {
         RobotController {
             robot: robot,
-            current_dir: CurrentDirection::Undefined,
+            current_dir: CurrentDirection::Stop,
         }
     }
 
@@ -167,7 +167,10 @@ impl RobotController {
                 self.robot.right();
                 self.current_dir = CurrentDirection::Right;
             }
-            _ => (),
+            CurrentDirection::Stop => {
+                self.robot.stop();
+                self.current_dir = CurrentDirection::Stop;
+            }
         }
     }
 }
