@@ -1,6 +1,6 @@
 # Rusty Bot
 
-I already had a little robot running with C++ and tried this project with Rust.
+I already had a little robot running with [C++ and ROS](https://gitlab.com/ysngndz/raspi_robot_driver) and tried this project with Rust.
 Beware of hacky code, stupid logic running around and heavy use of 3rd party!
 
 
