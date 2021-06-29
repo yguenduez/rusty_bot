@@ -12,7 +12,7 @@ The project consists of:
 * a `robot_core`, which serves as a library, used by the `robot` application. Here the tcp server's "logic" is defined.
 * a `gamepad_client` executable, which takes the first gamepad client accessable from the pc and listens for gamepad inputs. It then sends serialized json (thanks serde library!) onto the openend tcp sever port of the pi: `raspberrypi.local:3333`.
 
-To put is very simple this image below will demonstrate the complexity of the project:
+To put it very simple this image below will demonstrate the complexity of the project:
 
 <img src="images/overview.png" alt="Overview" style="width:600px;"/>
 
